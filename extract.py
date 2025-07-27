@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
-
-
+import os
+from datetime import date
 
 # Function to read API key from secrets.txt
 def read_api_key(filepath='secrets.txt', key_name='TWELVE_DATA_API_KEY'):
@@ -46,7 +46,9 @@ def get_stock_data_from_twelvedata(tickers, api_key, interval='1day', outputsize
             df = df.astype(float)  # Convert all columns to numeric
 
             # Save to CSV file
-            csv_filename = f"{ticker}_data.csv"
+            today = date.today()
+            date_str = today.strftime("%Y-%m-%d")
+            csv_filename = f"{ticker}_data_{date_str}.csv"
             df.to_csv(csv_filename)
 
             result[ticker] = df
@@ -60,7 +62,6 @@ if __name__ == "__main__":
     # Example usage
     try:
         api_key = read_api_key()
-        print(api_key)
         tickers = ['NVDA', 'PLTR']
         stock_data = get_stock_data_from_twelvedata(tickers, api_key)
 
