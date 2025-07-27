@@ -20,14 +20,14 @@ CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
 """
 
 def setup_database():
-    conn = psycopg2.connect(
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=DB_PORT
-    )
-    cur = conn.cursor()
+    # conn = psycopg2.connect(
+    #     dbname=DB_NAME,
+    #     user=DB_USER,
+    #     password=DB_PASSWORD,
+    #     host=DB_HOST,
+    #     port=DB_PORT
+    # )
+    # cur = conn.cursor()
     cur.execute(CREATE_TABLE_SQL)
     conn.commit()
     # cur.close()
