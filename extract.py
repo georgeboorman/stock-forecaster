@@ -1,6 +1,5 @@
 import requests
 import pandas as pd
-import os
 
 # Function to read API key from secrets.txt
 def read_api_key(filepath='secrets.txt', key_name='TWELVE_DATA_API_KEY'):
