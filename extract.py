@@ -1,9 +1,7 @@
 import requests
 import pandas as pd
-import os
 from datetime import date
 
-# Function to read API key from secrets.txt
 def read_api_key(filepath='secrets.txt', key_name='TWELVE_DATA_API_KEY'):
     with open(filepath, 'r') as file:
         for line in file:
@@ -12,7 +10,7 @@ def read_api_key(filepath='secrets.txt', key_name='TWELVE_DATA_API_KEY'):
     raise ValueError(f"{key_name} not found in {filepath}")
     
 
-def get_stock_data_from_twelvedata(tickers, api_key, interval='1day', outputsize=5):
+def get_stock_data(tickers, api_key, interval='1day', outputsize=5):
     """
     Fetch historical stock data from Twelve Data API and return as a dict of DataFrames.
 
@@ -63,7 +61,7 @@ if __name__ == "__main__":
     try:
         api_key = read_api_key()
         tickers = ['NVDA', 'PLTR']
-        stock_data = get_stock_data_from_twelvedata(tickers, api_key)
+        stock_data = get_stock_data(tickers, api_key)
 
         for ticker, df in stock_data.items():
             if df is not None:
