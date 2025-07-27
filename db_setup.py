@@ -1,11 +1,9 @@
 import psycopg2
 import pandas as pd
+from db_auth import authenticate_db
 
-DB_NAME = "stock_data"
-DB_USER = "postgres"
-DB_PASSWORD = "your_password"  # Change as needed
-DB_HOST = "localhost"
-DB_PORT = "5432"
+conn, cur = authenticate_db()
+
 TABLE_NAME = "stock_prices"
 
 CREATE_TABLE_SQL = f"""
@@ -32,21 +30,21 @@ def setup_database():
     cur = conn.cursor()
     cur.execute(CREATE_TABLE_SQL)
     conn.commit()
-    cur.close()
-    conn.close()
+    # cur.close()
+    # conn.close()
 
 def load_csv_to_db(csv_path, ticker):
     df = pd.read_csv(csv_path)
     df['ticker'] = ticker
     df['datetime'] = pd.to_datetime(df['datetime'])
-    conn = psycopg2.connect(
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=DB_PORT
-    )
-    cur = conn.cursor()
+    # conn = psycopg2.connect(
+    #     dbname=DB_NAME,
+    #     user=DB_USER,
+    #     password=DB_PASSWORD,
+    #     host=DB_HOST,
+    #     port=DB_PORT
+    # )
+    # cur = conn.cursor()
     for _, row in df.iterrows():
         cur.execute(f"""
             INSERT INTO {TABLE_NAME} (ticker, datetime, open, high, low, close, volume)
@@ -58,6 +56,7 @@ def load_csv_to_db(csv_path, ticker):
     conn.close()
 
 if __name__ == "__main__":
+    conn, cur = authenticate_db()
     setup_database()
     load_csv_to_db("NVDA_data.csv", "NVDA")
     load_csv_to_db("PLTR_data.csv", "PLTR")

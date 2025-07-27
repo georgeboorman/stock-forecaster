@@ -1,3 +1,4 @@
 pandas==2.1.3
 requests==2.31.0
 jupyter==1.1.1
+psycopyg2==2.9.5
