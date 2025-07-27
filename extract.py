@@ -1,6 +1,8 @@
 import requests
 import pandas as pd
 
+
+
 # Function to read API key from secrets.txt
 def read_api_key(filepath='secrets.txt', key_name='TWELVE_DATA_API_KEY'):
     with open(filepath, 'r') as file:
@@ -8,15 +10,6 @@ def read_api_key(filepath='secrets.txt', key_name='TWELVE_DATA_API_KEY'):
             if line.strip().startswith(key_name + '='):
                 return line.strip().split('=')[1]
     raise ValueError(f"{key_name} not found in {filepath}")
-
-# for greater simplicity install our package
-# https://github.com/twelvedata/twelvedata-python
-
-import requests
-
-response = requests.get("https://api.twelvedata.com/time_series?apikey=1c7303e404eb418485c1023acd179f64&interval=1min&symbol=NVDA&type=stock&outputsize=5&start_date=2025-07-24 00:00:00&end_date=2025-07-25 00:00:00&format=CSV")
-
-print(response.text)
     
 
 def get_stock_data_from_twelvedata(tickers, api_key, interval='1day', outputsize=5):
@@ -67,6 +60,7 @@ if __name__ == "__main__":
     # Example usage
     try:
         api_key = read_api_key()
+        print(api_key)
         tickers = ['NVDA', 'PLTR']
         stock_data = get_stock_data_from_twelvedata(tickers, api_key)
 
