@@ -13,7 +13,7 @@ def authenticate_db(filepath='secrets.txt'):
                 creds[k] = v
     try:
         conn = psycopg2.connect(
-            dbname=creds.get('POSTGRES_DB_NAME')
+            dbname=creds.get('POSTGRES_DB_NAME'),
             user=creds.get('POSTGRES_USER'),
             password=creds.get('POSTGRES_PASSWORD')
             # host=creds.get('POSTGRES_HOST', 'localhost'),
