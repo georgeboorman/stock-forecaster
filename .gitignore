@@ -1,6 +1,9 @@
 # Secrets
 secrets.txt
 
+# Venv
+*stock_forecast/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
