@@ -26,22 +26,27 @@
     <div id="visualization"></div>
 
     <script>
-        document.getElementById('forecast-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
+        document.getElementById("forecast-form").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Prevent default form submission
 
-            const ticker = document.getElementById('ticker').value;
-            const days = document.getElementById('days').value;
+            const ticker = document.getElementById("ticker").value;
+            const days = document.getElementById("days").value;
 
-            const response = await fetch('/forecast', {
-                method: 'POST',
+            const response = await fetch("/forecast", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ ticker, days }),
+                body: JSON.stringify({ ticker, days })
             });
 
-            const html = await response.text();
-            document.getElementById('visualization').innerHTML = html;
+            if (response.ok) {
+                const html = await response.text();
+                document.getElementById("visualization").innerHTML = html; // Insert the visualization
+            } else {
+                const error = await response.json();
+                alert(`Error: ${error.detail || "Failed to generate forecast"}`);
+            }
         });
     </script>
 </body>

@@ -44,8 +44,8 @@ def forecast_stock(data: ForecastRequest):
         # Generate the visualization
         fig = visualize_forecast(train_df, forecast)
 
-        # Return the visualization as HTML
-        return fig.to_html(full_html=True, include_plotlyjs="cdn")
+        # Return the visualization wrapped in a div
+        return f'<div id="plotly-visualization">{fig.to_html(full_html=False, include_plotlyjs="cdn")}</div>'
     except Exception as e:
         return {"error": str(e)}
 
