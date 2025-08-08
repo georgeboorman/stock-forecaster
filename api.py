@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from forecast import load_and_split_data, train_model, forecast_with_model
+from forecast import load_and_split_data, train_model, forecast_with_model, visualize_forecast
 
 app = FastAPI()
 
@@ -19,7 +19,9 @@ def forecast_stock(data: ForecastRequest):
         # Forecast using the trained model
         forecast = forecast_with_model(model, data.days)
 
-        # Return the forecast
-        return forecast.to_dict(orient="records")
+        # Visualize the forecast
+        visualize_forecast(train_df, forecast)
+
+        # return {"message": "Visualization generated successfully."}
     except Exception as e:
         return {"error": str(e)}
