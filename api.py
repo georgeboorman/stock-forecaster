@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-import pandas as pd
-from prophet import Prophet
+from forecast import load_and_split_data, train_model, forecast_with_model
 
 app = FastAPI()
 
@@ -11,26 +10,16 @@ class ForecastRequest(BaseModel):
 @app.post("/forecast")
 def forecast_stock(data: ForecastRequest):
     try:
-        # Load the data
-        df = pd.read_csv("stocks.csv")
+        # Load and split the data
+        train_df, _ = load_and_split_data("stocks.csv")
 
-        # Prepare the data for Prophet
-        df = df.rename(columns={"datetime": "ds", "close": "y"})
+        # Train the model
+        model = train_model(train_df)
 
-        # Split into training and test sets (80/20 split)
-        train_size = int(len(df) * 0.8)
-        train_df = df[:train_size]
-
-        # Train the Prophet model
-        model = Prophet()
-        model.fit(train_df)
-
-        # Make future predictions
-        future = model.make_future_dataframe(periods=data.days)
-        forecast = model.predict(future)
+        # Forecast using the trained model
+        forecast = forecast_with_model(model, data.days)
 
         # Return the forecast
-        return forecast.tail(data.days).to_dict(orient="records")
+        return forecast.to_dict(orient="records")
     except Exception as e:
         return {"error": str(e)}
-    
