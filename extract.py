@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 import psycopg2
 from datetime import date
+from db_auth import authenticate_db
 
 
 
@@ -15,30 +16,7 @@ def read_api_key(filepath='secrets.txt', key_name='TWELVE_DATA_API_KEY'):
                 return line.strip().split('=', 1)[1]
     raise ValueError(f"{key_name} not found in {filepath}")
 
-def authenticate_db(filepath='secrets.txt'):
-    """
-    Authenticates and returns a PostgreSQL connection and cursor.
-    Raises an exception if connection fails.
-    """
-    creds = {}
-    with open(filepath, 'r') as file:
-        for line in file:
-            if '=' in line:
-                k, v = line.strip().split('=', 1)
-                creds[k] = v
-    try:
-        conn = psycopg2.connect(
-            dbname=creds.get('POSTGRES_DB_NAME', 'stock_data'),
-            user=creds.get('POSTGRES_USER', 'postgres'),
-            password=creds.get('POSTGRES_PASSWORD', ''),
-            host=creds.get('POSTGRES_HOST', 'localhost'),
-            port=creds.get('POSTGRES_PORT', '5432')
-        )
-        cur = conn.cursor()
-        return conn, cur
-    except Exception as e:
-        raise ConnectionError(f"Failed to connect to PostgreSQL: {e}")
-    
+conn, cur = authenticate_db()    
 
 
 def get_stock_data(tickers, api_key, interval='1day', outputsize=5):
@@ -88,11 +66,8 @@ def update_db(data_dict, conn, cur, table_name="stock_prices"):
                 cur.execute(f"""
                     INSERT INTO {table_name} (ticker, datetime, open, high, low, close, volume)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
-                    ON CONFLICT (ticker, datetime) DO NOTHING;
                 """, (row['ticker'], row['datetime'], row['open'], row['high'], row['low'], row['close'], row['volume']))
     conn.commit()
-    cur.close()
-    conn.close()
 
 
 if __name__ == "__main__":
@@ -109,3 +84,5 @@ if __name__ == "__main__":
                 print(f"No data available for {ticker}.\n")
     except Exception as e:
         print(f"An error occurred: {e}")
+    cur.close()
+    conn.close()

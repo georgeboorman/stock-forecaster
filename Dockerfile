@@ -28,3 +28,5 @@ COPY . .
 # CMD ["python3", "extract.py"]
 # Expose PostgreSQL port (optional, if you want to access from outside)
 EXPOSE 5432
+
+CMD ["python3", "db_setup.py"]
