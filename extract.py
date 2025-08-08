@@ -64,7 +64,7 @@ def update_db(data_dict, conn, cur, table_name="stock_prices"):
         if df is not None:
             for _, row in df.iterrows():
                 cur.execute(f"""
-                    INSERT INTO {table_name} (ticker, datetime, open, high, low, close, volume)
+                    INSERT INTO {table_name} (ticker, date, open, high, low, close, volume)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """, (row['ticker'], row['datetime'], row['open'], row['high'], row['low'], row['close'], row['volume']))
     conn.commit()
