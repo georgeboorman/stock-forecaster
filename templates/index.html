@@ -42,9 +42,11 @@
 
             if (response.ok) {
                 const html = await response.text();
+                console.log("Received response from backend:", html); // Debugging log for frontend
                 document.getElementById("visualization").innerHTML = html; // Insert the visualization
             } else {
                 const error = await response.json();
+                console.error("Error response from backend:", error); // Debugging log for frontend
                 alert(`Error: ${error.detail || "Failed to generate forecast"}`);
             }
         });
