@@ -24,8 +24,6 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copy project files
 COPY . .
 
-# (Optional) Run application
-# CMD ["python3", "extract.py"]
 # Expose PostgreSQL port (optional, if you want to access from outside)
 EXPOSE 5432
 

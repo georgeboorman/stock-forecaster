@@ -19,7 +19,7 @@ def read_api_key(filepath='secrets.txt', key_name='TWELVE_DATA_API_KEY'):
 conn, cur = authenticate_db()    
 
 
-def get_stock_data(tickers, api_key, interval='1day', outputsize=5):
+def get_stock_data(tickers, api_key, interval='1day', outputsize=180):
     """
     Fetch historical stock data from Twelve Data API and return as a dict of DataFrames.
 
@@ -46,7 +46,7 @@ def get_stock_data(tickers, api_key, interval='1day', outputsize=5):
         if "values" in data:
             df = pd.DataFrame(data['values'])
             df['ticker'] = ticker
-            df['datetime'] = pd.to_datetime(df['datetime'])
+            df['date'] = pd.to_datetime(df['datetime'])
             # Convert columns to float
             for col in ['open', 'high', 'low', 'close', 'volume']:
                 df[col] = df[col].astype(float)
@@ -69,19 +69,31 @@ def update_db(data_dict, conn, cur, table_name="stock_prices"):
                 """, (row['ticker'], row['datetime'], row['open'], row['high'], row['low'], row['close'], row['volume']))
     conn.commit()
 
+def save_to_csv(data_dict, filename="stocks.csv"):
+    """
+    Save all stock data to a single CSV file.
+
+    Parameters:
+        data_dict (dict): Dictionary of DataFrames keyed by ticker symbol
+        filename (str): Name of the CSV file to save data
+    """
+    combined_df = pd.concat(data_dict.values(), ignore_index=True)
+    combined_df.to_csv(filename, index=False)
+    print(f"Data saved to {filename}")
 
 if __name__ == "__main__":
     try:
         api_key = read_api_key()
-        conn, cur = authenticate_db()
-        tickers = ['NVDA', 'PLTR']
+        # conn, cur = authenticate_db()
+        tickers = ['NVDA', 'PLTR', 'MSFT']
         stock_data = get_stock_data(tickers, api_key)
-        update_db(stock_data, conn, cur)
-        for ticker, df in stock_data.items():
-            if df is not None:
-                print(f"Data for {ticker} inserted into database.\n{df.head()}\n")
-            else:
-                print(f"No data available for {ticker}.\n")
+        save_to_csv(stock_data)
+        # update_db(stock_data, conn, cur)
+        # for ticker, df in stock_data.items():
+        #     if df is not None:
+        #         print(f"Data for {ticker} inserted into database.\n{df.head()}\n")
+        #     else:
+        #         print(f"No data available for {ticker}.\n")
     except Exception as e:
         print(f"An error occurred: {e}")
     cur.close()
