@@ -32,7 +32,7 @@
             const ticker = document.getElementById("ticker").value;
             const days = document.getElementById("days").value;
 
-            const response = await fetch("/forecast", {
+            const response = await fetch("https://stock-forecaster-2ubp.onrender.com/forecast", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

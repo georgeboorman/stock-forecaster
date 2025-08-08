@@ -14,7 +14,7 @@ if response.status_code == 200:
         file.write(visualization_html) 
     
     # Open the served visualization route
-    webbrowser.open("http://127.0.0.1:8000/forecast_visualization.html")
+    webbrowser.open(f"http://127.0.0.1:8000/forecast_visualization.html")
 else:
     print(f"Error: {response.status_code}")
     print(response.json())
