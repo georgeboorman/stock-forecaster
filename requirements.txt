@@ -4,6 +4,8 @@ jupyter==1.1.1
 # psycopg2-binary==2.9.5
 psycopg2==2.9.5
 plotly==5.16.0
-fastapi==0.95.2
+fastapi==0.116.0
 uvicorn==0.22.0
 prophet==1.1.7
+scikit-learn==1.6.0
+pydantic==2.6.2
