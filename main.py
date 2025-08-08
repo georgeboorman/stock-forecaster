@@ -4,11 +4,21 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from forecast import load_and_split_data, train_model, forecast_with_model, visualize_forecast
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import logging
 logging.getLogger("cmdstanpy").setLevel(logging.WARNING)
 
 app = FastAPI()
+
+# Add CORS middleware to allow requests from the frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace "*" with specific frontend URL for better security
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Ensure the 'static' directory exists
 if not os.path.exists("static"):
