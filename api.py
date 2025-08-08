@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from forecast import load_and_split_data, train_model, forecast_with_model, visualize_forecast
 
@@ -7,7 +8,7 @@ app = FastAPI()
 class ForecastRequest(BaseModel):
     days: int
 
-@app.post("/forecast")
+@app.post("/forecast", response_class=HTMLResponse)
 def forecast_stock(data: ForecastRequest):
     try:
         # Load and split the data
@@ -19,9 +20,10 @@ def forecast_stock(data: ForecastRequest):
         # Forecast using the trained model
         forecast = forecast_with_model(model, data.days)
 
-        # Visualize the forecast
-        visualize_forecast(train_df, forecast)
+        # Generate the visualization
+        fig = visualize_forecast(train_df, forecast)
 
-        # return {"message": "Visualization generated successfully."}
+        # Return the visualization as HTML
+        return fig.to_html(full_html=False, include_plotlyjs="cdn")
     except Exception as e:
         return {"error": str(e)}

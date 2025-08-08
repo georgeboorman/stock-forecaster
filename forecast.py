@@ -90,7 +90,7 @@ def visualize_forecast(train_df, forecast):
         forecast (DataFrame): Forecasted data.
 
     Returns:
-        None
+        plotly.graph_objects.Figure: The generated plotly figure.
     """
     fig = go.Figure()
 
@@ -109,8 +109,7 @@ def visualize_forecast(train_df, forecast):
     # Customize layout
     fig.update_layout(title="Training Data and Forecast with Confidence Intervals", xaxis_title="Date", yaxis_title="Value")
 
-    # Show plot
-    fig.show()
+    return fig
 
 if __name__ == "__main__":
     try:
