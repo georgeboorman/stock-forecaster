@@ -8,13 +8,8 @@ payload = {"ticker": "NVDA", "days": 30}  # Specify the ticker and number of day
 response = requests.post(url, json=payload)
 
 if response.status_code == 200:
-    # Produce the visualization
-    visualization_html = response.text
-    with open("forecast_visualization.html", "w") as file:
-        file.write(visualization_html) 
-    
-    # Open the served visualization route
-    webbrowser.open(f"http://127.0.0.1:8000/forecast_visualization.html")
+    # Print the predicted value
+    print("Predicted value:", response.json().get("predicted_value"))
 else:
     print(f"Error: {response.status_code}")
     print(response.json())

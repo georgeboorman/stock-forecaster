@@ -1,7 +1,6 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from prophet import Prophet
-import mlflow
 import plotly.graph_objects as go
 import logging
 import numpy as np
@@ -50,66 +49,13 @@ def forecast_with_model(model, days):
         days (int): Number of days to forecast.
 
     Returns:
-        DataFrame: Forecasted data.
+        DataFrame: Forecasted data for the requested days.
     """
     future = model.make_future_dataframe(periods=days)
     forecast = model.predict(future)
     return forecast.tail(days)
 
-def log_to_mlflow(model, forecast, train_df):
-    """
-    Log the model and forecast results to MLflow.
-
-    Parameters:
-        model (Prophet): Trained Prophet model.
-        forecast (DataFrame): Forecasted data.
-        train_df (DataFrame): Training data.
-    """
-    with mlflow.start_run() as run:
-        # Log model
-        mlflow.prophet.log_model(model, "model")
-
-        # Log forecast data directly as an artifact
-        forecast_buffer = forecast.to_csv(index=False)
-        mlflow.log_text(forecast_buffer, f"forecast_{run.info.run_id}.csv")
-
-        # Log training data directly as an artifact
-        train_buffer = train_df.to_csv(index=False)
-        mlflow.log_text(train_buffer, f"train_data_{run.info.run_id}.csv")
-
-        # Log parameters
-        mlflow.log_param("training_data_size", len(train_df))
-        mlflow.log_param("forecast_periods", len(forecast))
-
-def visualize_forecast(train_df, forecast):
-    """
-    Create a visualization of the training data and forecasted values, including upper and lower bounds.
-
-    Parameters:
-        train_df (DataFrame): Training data.
-        forecast (DataFrame): Forecasted data.
-
-    Returns:
-        plotly.graph_objects.Figure: The generated plotly figure.
-    """
-    fig = go.Figure()
-
-    # Add training data
-    fig.add_trace(go.Scatter(x=np.array(train_df["ds"]), y=train_df["y"], mode="lines", name="Training Data"))
-
-    # Add forecasted data
-    fig.add_trace(go.Scatter(x=np.array(forecast["ds"]), y=forecast["yhat"], mode="lines", name="Forecast"))
-
-    # Add upper bound
-    fig.add_trace(go.Scatter(x=np.array(forecast["ds"]), y=forecast["yhat_upper"], mode="lines", name="Upper Bound", line=dict(dash="dot")))
-
-    # Add lower bound
-    fig.add_trace(go.Scatter(x=np.array(forecast["ds"]), y=forecast["yhat_lower"], mode="lines", name="Lower Bound", line=dict(dash="dot")))
-
-    # Customize layout
-    fig.update_layout(title="Training Data and Forecast with Confidence Intervals", xaxis_title="Date", yaxis_title="Value")
-
-    return fig
+## Visualization function removed. Only prediction values are now returned by the API.
 
 if __name__ == "__main__":
     try:
@@ -122,10 +68,6 @@ if __name__ == "__main__":
         # Forecast using the trained model
         forecast = forecast_with_model(model, days=30)  # Example: forecast for 30 days
 
-        # Log to MLflow
-        log_to_mlflow(model, forecast, train_df)
-
-        # Visualize the forecast
-        visualize_forecast(train_df, forecast)
+        # Visualize the forecast (removed)
     except Exception as e:
         print(f"An error occurred: {e}")

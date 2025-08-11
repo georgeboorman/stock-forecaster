@@ -3,10 +3,11 @@ from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from forecast import load_and_split_data, train_model, forecast_with_model, visualize_forecast
+from forecast import load_and_split_data, forecast_with_model
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import logging
+import pickle
 logging.getLogger("cmdstanpy").setLevel(logging.WARNING)
 
 app = FastAPI()
@@ -42,23 +43,17 @@ def favicon():
 @app.post("/forecast", response_class=HTMLResponse)
 def forecast_stock(data: ForecastRequest):
     try:
-        # Load and split the data
-        train_df, _ = load_and_split_data("stocks.csv", ticker=data.ticker)
-
-        # Train the model
-        model = train_model(train_df)
+        # Load the trained model from pickle
+        with open("prophet_model.pkl", "rb") as f:
+            model = pickle.load(f)
 
         # Forecast using the trained model
         forecast = forecast_with_model(model, data.days)
 
-        # Generate the visualization
-        fig = visualize_forecast(train_df, forecast)
-
-        # Return the visualization wrapped in a div
-        return f'<div id="plotly-visualization">{fig.to_html(full_html=False, include_plotlyjs="cdn")}</div>'
+        # Get the predicted value for the last day in the forecast
+        predicted_value = forecast.iloc[-1]["yhat"]
+        return {"predicted_value": predicted_value}
     except Exception as e:
         return {"error": str(e)}
 
-@app.get("/forecast_visualization.html")
-def get_visualization():
-    return FileResponse("forecast_visualization.html")
+## Visualization endpoint removed since we no longer visualize predictions
