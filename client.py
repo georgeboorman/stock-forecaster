@@ -11,7 +11,7 @@ today = datetime.today()
 data = []
 for ticker in tickers:
     for days in days_list:
-        forecast_date = (today + timedelta(days=days)).strftime("%m/%d/%Y")
+        forecast_date = (today + timedelta(days=days)).strftime("%Y-%m-%d")
         data.append((ticker, forecast_date))
 
 url = "http://0.0.0.0:8000/forecast"

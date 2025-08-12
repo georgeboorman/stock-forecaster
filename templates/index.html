@@ -15,8 +15,8 @@
             <option value="PLTR">PLTR</option>
         </select>
 
-        <label for="forecast_date">Forecast Date (MM/DD/YYYY):</label>
-        <input type="text" id="forecast_date" name="forecast_date" placeholder="MM/DD/YYYY" pattern="\d{2}/\d{2}/\d{4}" required>
+        <label for="forecast_date">Forecast Date (YYYY-MM-DD):</label>
+        <input type="text" id="forecast_date" name="forecast_date" placeholder="YYYY-MM-DD" pattern="\d{4}-\d{2}-\d{2}" required>
 
         <button type="submit">Generate Forecast</button>
     </form>
@@ -28,8 +28,12 @@
             event.preventDefault();
             const ticker = document.getElementById("ticker").value;
             const forecast_date = document.getElementById("forecast_date").value;
-
-
+            // Optionally, validate format in JS (YYYY-MM-DD)
+            const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+            if (!datePattern.test(forecast_date)) {
+                document.getElementById("prediction-result").innerHTML = `<span style='color:red;'>Please enter date as YYYY-MM-DD.</span>`;
+                return;
+            }
             // Build query string for GET request
             const params = new URLSearchParams({ ticker, forecast_date });
             const response = await fetch(`/forecast?${params.toString()}`);

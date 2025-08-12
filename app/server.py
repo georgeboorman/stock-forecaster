@@ -11,30 +11,32 @@ app = FastAPI()
 #     ticker: str
 #     forecast_date: str  # MM/DD/YYYY
 
+
 @app.get("/")
 def read_root():
-    return {"message": "Stock forecasting model API. Visit /docs for API documentation, or use the /forecast endpoint to get predictions."}
+    return {"message": "Stock forecasting model API. Visit /docs for API documentation, or use the /forecast endpoint to get predictions.\n"
+    "Example request: /forecast?ticker=NVDA&forecast_date=2025-12-20"}
 
 @app.get("/forecast")
 def predict_stock(
     ticker: str = Query(..., description="Stock ticker symbol"),
-    forecast_date: str = Query(..., description="Forecast date in MM/DD/YYYY format")
+    forecast_date: str = Query(..., description="Forecast date in YYYY-MM-DD format")
 ):
     """
-    Predict stock price for the given ticker and forecast date (MM/DD/YYYY).
+    Predict stock price for the given ticker and forecast date (YYYY-MM-DD).
 
     Args:
         ticker (str): Stock ticker symbol.
-        forecast_date (str): Date to forecast in MM/DD/YYYY format.
+        forecast_date (str): Date to forecast in YYYY-MM-DD format.
 
     Returns:
         dict: Predicted stock price for the requested date.
     """
     from datetime import datetime
     try:
-        target_date = datetime.strptime(forecast_date, "%m/%d/%Y")
+        target_date = datetime.strptime(forecast_date, "%Y-%m-%d")
     except ValueError:
-        return {"error": "Invalid date format. Use MM/DD/YYYY."}
+        return {"error": "Invalid date format. Use YYYY-MM-DD."}
 
     last_train_date = model.history['ds'].max()
     days_ahead = (target_date - last_train_date).days
