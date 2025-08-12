@@ -17,8 +17,8 @@
             <option value="AMZN">AMZN</option>
         </select>
 
-        <label for="days">Number of Days to Predict:</label>
-        <input type="number" id="days" name="days" min="1" max="365" required>
+        <label for="forecast_date">Forecast Date (MM/DD/YYYY):</label>
+        <input type="text" id="forecast_date" name="forecast_date" placeholder="MM/DD/YYYY" pattern="\d{2}/\d{2}/\d{4}" required>
 
         <button type="submit">Generate Forecast</button>
     </form>
@@ -29,27 +29,31 @@
         document.getElementById("forecast-form").addEventListener("submit", async function(event) {
             event.preventDefault();
             const ticker = document.getElementById("ticker").value;
-            const days = document.getElementById("days").value;
+            const forecast_date = document.getElementById("forecast_date").value;
 
             const response = await fetch("/forecast", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ ticker, days })
+                body: JSON.stringify({ ticker, forecast_date })
             });
 
             const resultDiv = document.getElementById("prediction-result");
             if (response.ok) {
                 const data = await response.json();
                 if (data.predicted_value !== undefined) {
-                    resultDiv.innerHTML = `<strong>Predicted value for ${ticker} in ${days} day(s):</strong> $${data.predicted_value.toFixed(2)}`;
+                    resultDiv.innerHTML = `<strong>Predicted value for ${ticker} on ${forecast_date}:</strong> $${data.predicted_value.toFixed(2)}`;
                 } else {
                     resultDiv.innerHTML = `<span style='color:red;'>No prediction available.</span>`;
                 }
             } else {
-                const error = await response.json();
-                resultDiv.innerHTML = `<span style='color:red;'>Error: ${error.error || error.detail || "Failed to generate forecast"}</span>`;
+                let errorMsg = "Failed to generate forecast";
+                try {
+                    const error = await response.json();
+                    errorMsg = error.error || error.detail || errorMsg;
+                } catch {}
+                resultDiv.innerHTML = `<span style='color:red;'>Error: ${errorMsg}</span>`;
             }
         });
     </script>
