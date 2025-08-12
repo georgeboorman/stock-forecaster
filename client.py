@@ -1,41 +1,32 @@
 import json
 import requests
 
-data = [["NVDA", 1],
-        ["NVDA", 5],
-        ["NVDA", 10],
-        ["NVDA", 30],
-        ["MSFT", 1],
-        ["MSFT", 5],
-        ["MSFT", 10],
-        ["MSFT", 30],
-        ["PLTR", 1],
-        ["PLTR", 5],
-        ["PLTR", 10],
-        ["PLTR", 30]]
+
+from datetime import datetime, timedelta
+
+# Example: forecast for 1, 5, 10, 30 days ahead from today for each ticker
+tickers = ["NVDA", "MSFT", "PLTR"]
+days_list = [1, 5, 10, 30]
+today = datetime.today()
+data = []
+for ticker in tickers:
+    for days in days_list:
+        forecast_date = (today + timedelta(days=days)).strftime("%m/%d/%Y")
+        data.append([ticker, forecast_date])
 
 url = "http://0.0.0.0:8000/forecast"
 
 predictions = []
 
-for record in data:
-    ticker, days = record
-    payload = {
-        "ticker": ticker,
-        "days": days
-    }
-    
-    # Convert to JSON string
-    payload = json.dumps(payload)
-    response = requests.post(url, payload)
-
+for ticker, forecast_date in data:
+    response = requests.post(url, json={"ticker": ticker, "forecast_date": forecast_date})
     predictions.append(response.json())
 
-# Print all predictions
-for prediction in predictions:
-    print(f"Ticker: {prediction['ticker']}, Date: {prediction['date']}, Predicted Value: {prediction['predicted_value']}")
-
-
 data = json.dumps(data)
-response = requests.post(url, data)
-print(response.json())
+# Print all predictions
+
+for prediction in predictions:
+    if "error" in prediction:
+        print(f"Error for {prediction.get('ticker', 'N/A')}: {prediction['error']}")
+    else:
+        print(f"Ticker: {prediction['ticker']}, Date: {prediction['date']}, Predicted Value: {prediction['predicted_value']}")
