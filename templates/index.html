@@ -29,13 +29,10 @@
             const ticker = document.getElementById("ticker").value;
             const forecast_date = document.getElementById("forecast_date").value;
 
-            const response = await fetch("/forecast", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ ticker, forecast_date })
-            });
+
+            // Build query string for GET request
+            const params = new URLSearchParams({ ticker, forecast_date });
+            const response = await fetch(`/forecast?${params.toString()}`);
 
             const resultDiv = document.getElementById("prediction-result");
             if (response.ok) {
