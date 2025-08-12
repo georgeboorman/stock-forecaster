@@ -2,20 +2,25 @@
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
 import pickle
+from fastapi.responses import HTMLResponse
 
 model = pickle.load(open("prophet_model.pkl", "rb"))
-
 app = FastAPI()
 
-# class ForecastRequest(BaseModel):
-#     ticker: str
-#     forecast_date: str  # MM/DD/YYYY
 
-
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def read_root():
-    return {"message": "Stock forecasting model API. Visit /docs for API documentation, or use the /forecast endpoint to get predictions.\n"
-    "Example request: /forecast?ticker=NVDA&forecast_date=2025-12-20"}
+    return """
+    <h1>Stock Forecaster API</h1>
+    <p>Use the <code>/forecast</code> endpoint with <b>ticker</b> and <b>forecast_date</b> (YYYY-MM-DD) as query parameters.</p>
+    <form action="/forecast" method="get">
+        <label for="ticker">Ticker:</label>
+        <input type="text" id="ticker" name="ticker" value="NVDA"><br>
+        <label for="forecast_date">Forecast Date (YYYY-MM-DD):</label>
+        <input type="text" id="forecast_date" name="forecast_date" value="2025-12-20"><br>
+        <input type="submit" value="Generate Forecast">
+    </form>
+    """
 
 @app.get("/forecast")
 def predict_stock(
