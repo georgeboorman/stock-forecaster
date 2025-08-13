@@ -22,7 +22,7 @@ ENV AIRFLOW_HOME=/code/airflow
 ENV AIRFLOW__CORE__DAGS_FOLDER=/code/dags
 COPY dag.py /code/dags/
 
-# Expose port
+# Expose ports for FastAPI, MLflow, and Airflow
 EXPOSE 8000 5000 8080
 
-CMD ["bash", "start_services.sh"]
+CMD ["uvicorn", "app.server:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -44,22 +44,29 @@ Stock-Forecaster is an automated pipeline for extracting, forecasting, and evalu
    ```sh
    docker build -t <image-name> .
    ```
-4. Run the container interactively with port mapping:
+4. Run the container with an interactive shell, including port mapping:
    ```sh
-   docker run -it -p 8000:8000 -p 5001:5001 -p 8080:8080 <image-name>
+   docker run -it -p 8000:8000 -p 5000:5000 -p 8080:8080 <image-name>
    ```
-   - This exposes FastAPI (8000), MLflow UI (5001), and Airflow (8080) to your host.
-5. Inside the container, start all services:
+   - This exposes FastAPI (8000), MLflow UI (5000), and Airflow (8080) to your host.
+5. Inside the container, to start the API:
    ```sh
-   bash start_services.sh
+   uvicorn app.server:app --host 0.0.0.0 --port 8000
    ```
-   - FastAPI: [http://localhost:8000](http://localhost:8000)
-   - MLflow UI: [http://localhost:5001](http://localhost:5001)
-   - Airflow (not enabled by default, see `start_services.sh`): [http://localhost:8080](http://localhost:8080) 
-6. You can also run Python scripts manually inside the container:
+6. Inside the container, to start the MLflow UI:
+   ```sh
+   mlflow ui --host 0.0.0.0 --port 5000
+   ```
+7. (Optional) Inside the container, to set up and use Airflow:
+   ```sh
+   bash airflow_setup.sh
+   ```
+   - Airflow webserver: [http://localhost:8080](http://localhost:8080)
+   - Airflow is not enabled by default; only run this if you want to use Airflow automation.
+8. You can also run Python scripts manually inside the container:
    ```sh
    python3 extract.py
    python3 retraining.py
    ```
-7. To exit the container shell, type `exit`.
+9. To exit the container shell, type `exit`.
 
