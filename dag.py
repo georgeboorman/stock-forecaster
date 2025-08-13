@@ -36,7 +36,7 @@ dag = DAG(
     default_args=default_args,
     description='Extract new data, retrain Prophet model, and evaluate MAE on new data',
     schedule_interval='0 9 * * *',  # daily at 9am
-    catchup=False,
+    catchup=True,
 )
 
 extract_task = PythonOperator(
