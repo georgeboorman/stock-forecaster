@@ -1,16 +1,17 @@
 import os
+from dotenv import load_dotenv
 import requests
 import pandas as pd
 from datetime import date
-def read_api_key(filepath='secrets.txt', key_name='TWELVE_DATA_API_KEY'):
+def read_api_key(key_name='TWELVE_DATA_API_KEY'):
     """
-    Reads the API key from the secrets file.
+    Reads the API key from the .env file using python-dotenv.
     """
-    with open(filepath, 'r') as file:
-        for line in file:
-            if line.strip().startswith(key_name + '='):
-                return line.strip().split('=', 1)[1]
-    raise ValueError(f"{key_name} not found in {filepath}")
+    load_dotenv()
+    api_key = os.getenv(key_name)
+    if api_key is None:
+        raise ValueError(f"{key_name} not found in .env")
+    return api_key
 
 def get_stock_data(tickers, api_key, interval='1day'):
     """

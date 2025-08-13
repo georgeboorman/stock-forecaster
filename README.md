@@ -28,7 +28,7 @@ Stock-Forecaster is an automated pipeline for extracting, forecasting, and evalu
 ## Getting Started
 ### Option 1: Native Python
 1. Clone the repo: `git clone https://github.com/georgeboorman/Stock-Forecaster.git`.
-2. Create an API key for [Twelve Data](https://twelvedata.com/) and store in a file called `secrets.txt`, e.g., `TWELVE_DATA_API_KEY=<YOUR-API-KEY>`.
+2. Create an API key for [Twelve Data](https://twelvedata.com/) and store as an environment variable, e.g., `TWELVE_DATA_API_KEY=<YOUR-API-KEY>`.
 3. Optional (recommended) - Create a virtual environment: `python3 -m venv <venv>`.
 3. Install dependencies: `pip install -r requirements.txt`.
 4. Run extraction: `python3 extract.py`.
