@@ -17,11 +17,10 @@ def train_and_save_model(file_path="stocks.csv", ticker="NVDA", model_path="prop
     print(f"Model saved to {model_path}")
     # Log retrain time
     retrain_time = datetime.now().isoformat()
-    with open("retrain_log.txt", "a") as logf:
-        logf.write(f"Retrained at {retrain_time}\n")
-
     # Evaluate MAE for last 7 days and log with MLflow
     mae = evaluate_mae(file_path=file_path, model_path=model_path, days=7)
+    with open("retrain_log.txt", "a") as logf:
+        logf.write(f"Retrained at {retrain_time}, MAE: {mae if mae is not None else 'N/A'}\n")
     mlflow.set_experiment("stock_forecaster")
     with mlflow.start_run(run_name=f"retrain_{retrain_time}"):
         mlflow.log_param("ticker", ticker)
@@ -40,16 +39,20 @@ def evaluate_mae(file_path="stocks.csv", model_path="prophet_model.pkl", days=7)
     df['ds'] = pd.to_datetime(df['date'])
     df = df.sort_values('ds')
     test_df = df.tail(days)
-    future = model.make_future_dataframe(periods=days)
+    # Forecast for the actual test dates
+    future = pd.DataFrame({'ds': test_df['ds']})
     forecast = model.predict(future)
     forecast = forecast.set_index('ds')
     y_true = []
     y_pred = []
     for _, row in test_df.iterrows():
         date = row['ds']
-        actual = row['close']  # Use 'close' as the target value
+        actual = row['close']
         if date in forecast.index:
             pred = forecast.loc[date]['yhat']
+            # If multiple rows for the same date, take the first
+            if isinstance(pred, pd.Series):
+                pred = pred.iloc[0]
             y_true.append(actual)
             y_pred.append(pred)
     if y_true:
