@@ -2,6 +2,7 @@
 set -e
 
 # Airflow user setup (if not already created)
+# Change your details as needed
 airflow users create \
     --username admin \
     --firstname Admin \
