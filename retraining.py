@@ -47,7 +47,7 @@ def evaluate_mae(file_path="stocks.csv", model_path="prophet_model.pkl", days=7)
     y_pred = []
     for _, row in test_df.iterrows():
         date = row['ds']
-        actual = row['y']
+        actual = row['close']  # Use 'close' as the target value
         if date in forecast.index:
             pred = forecast.loc[date]['yhat']
             y_true.append(actual)
