@@ -12,7 +12,7 @@ app = FastAPI()
 def read_root():
     return """
     <h1>Stock Forecaster API</h1>
-    <p>Use the <code>/forecast</code> endpoint with <b>ticker</b> and <b>forecast_date</b> (YYYY-MM-DD) as query parameters.</p>
+    <p>Use the <code>/forecast</code> endpoint with <b>Ticker</b> and <b>Forecast Date</b> (YYYY-MM-DD) as query parameters.</p>
     <form action="/forecast" method="get">
         <label for="ticker">Ticker:</label>
         <input type="text" id="ticker" name="ticker" value="NVDA"><br>
