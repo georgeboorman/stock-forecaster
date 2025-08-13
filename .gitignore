@@ -212,6 +212,9 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
+# MLflow
 mlruns/*
-
 mlruns
+
+# App cache
+app/__pycache__/
