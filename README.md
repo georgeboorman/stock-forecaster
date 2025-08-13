@@ -5,7 +5,7 @@ Stock-Forecaster is an automated pipeline for extracting, forecasting, and evalu
 ## Features
 - **Data Extraction**: Pulls and appends new stock data from [Twelve Data](https://twelvedata.com/) to `stocks.csv`.
 - **Forecasting**: Trains Prophet models to forecast stock prices for Nvidia, Microsoft, and Palantir.
-- **API/Deployment**:  - deployed through [Render](https://render.com/) and a FastAPI server; provides a landing page ([here](https://.stock-forecaster-2ubp.onrender.com/)) and an endpoint for forecasting.
+- **API/Deployment**:  - deployed through [Render](https://render.com/) and a FastAPI server; provides a landing page ([here](https://stock-forecaster-2ubp.onrender.com/)) and an endpoint for forecasting.
 - **Automation**: Airflow DAGs automate daily extraction, retraining, and evaluation.
 - **Experiment Tracking**: MLflow logs model parameters, metrics (MAE), and artifacts for each retraining run.
 - **Jupyter/EDA**: Initial exploratory data analysis in `eda.ipynb`.
