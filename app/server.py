@@ -15,7 +15,11 @@ def read_root():
     <p>Use the <code>/forecast</code> endpoint with <b>Ticker</b> and <b>Forecast Date</b> (YYYY-MM-DD) as query parameters.</p>
     <form action="/forecast" method="get">
         <label for="ticker">Ticker:</label>
-        <input type="text" id="ticker" name="ticker" value="NVDA"><br>
+        <select id="ticker" name="ticker">
+            <option value="NVDA">NVDA</option>
+            <option value="MSFT">MSFT</option>
+            <option value="PLTR">PLTR</option>
+        </select><br>
         <label for="forecast_date">Forecast Date (YYYY-MM-DD):</label>
         <input type="text" id="forecast_date" name="forecast_date" value="2025-12-20"><br>
         <input type="submit" value="Generate Forecast">
