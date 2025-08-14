@@ -5,12 +5,10 @@ import subprocess
 import os
 import sys
 
-BASE_DIR = os.getcwd()
+BASE_DIR = os.environ.get("BASE_DIR")
 sys.path.append(BASE_DIR)
-DATA_PATH = os.path.join(BASE_DIR, 'stocks.csv')
-MODEL_PATH = os.path.join(BASE_DIR, 'prophet_model.pkl')
 EXTRACT_SCRIPT = os.path.join(BASE_DIR, 'extract.py')
-TRAIN_SCRIPT = os.path.join(BASE_DIR, 'retraining.py')
+DATA_PATH = os.path.join(BASE_DIR, 'stocks.csv')
 
 from retraining import evaluate_mae
 
@@ -26,10 +24,22 @@ def run_extract():
     subprocess.run(['python3', EXTRACT_SCRIPT], check=True)
 
 def retrain_model():
-    subprocess.run(['python3', TRAIN_SCRIPT], check=True)
+    # Retrain models for all tickers
+    import retraining
+    for ticker in ["NVDA", "MSFT", "PLTR"]:
+        retraining.train_and_save_model(ticker=ticker)
 
 def evaluate_model():
-    evaluate_mae(file_path=DATA_PATH, model_path=MODEL_PATH, days=7)
+    # Evaluate models for all tickers
+    import retraining
+    for ticker in ["NVDA", "MSFT", "PLTR"]:
+        if ticker == "NVDA":
+            model_path = os.path.join(BASE_DIR, "models/prophet_NVDA_run_3.pkl")
+        elif ticker == "MSFT":
+            model_path = os.path.join(BASE_DIR, "models/prophet_MSFT_run_5.pkl")
+        elif ticker == "PLTR":
+            model_path = os.path.join(BASE_DIR, "models/prophet_PLTR_run_5.pkl")
+        retraining.evaluate_mae(file_path=DATA_PATH, model_path=model_path, days=7)
 
 dag = DAG(
     'stock_forecaster_retrain_eval',

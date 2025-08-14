@@ -1,10 +1,10 @@
-
+from datetime import datetime
+import pickle
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
-import pickle
 from fastapi.responses import HTMLResponse
 
-model = pickle.load(open("prophet_model.pkl", "rb"))
+import os
 app = FastAPI()
 
 
@@ -24,6 +24,7 @@ def read_root():
         <input type="text" id="forecast_date" name="forecast_date" value="2025-12-20"><br>
         <input type="submit" value="Generate Forecast">
     </form>
+    <p style='color:red; margin-top:20px;'><strong>Disclaimer:</strong> This project and its machine learning model are for educational and informational purposes only and do not constitute financial advice. Do not use these forecasts for investment decisions.</p>
     """
 
 @app.get("/forecast")
@@ -41,7 +42,16 @@ def predict_stock(
     Returns:
         dict: Predicted stock price for the requested date.
     """
-    from datetime import datetime
+    # Select best model file for ticker
+    model_files = {
+        "NVDA": "models/prophet_NVDA_run_3.pkl",
+        "MSFT": "models/prophet_MSFT_run_5.pkl",
+        "PLTR": "models/prophet_PLTR_run_5.pkl"
+    }
+    model_path = model_files.get(ticker)
+    if not model_path or not os.path.exists(model_path):
+        return {"error": f"No model available for ticker {ticker}"}
+    model = pickle.load(open(model_path, "rb"))
     try:
         target_date = datetime.strptime(forecast_date, "%Y-%m-%d")
     except ValueError:

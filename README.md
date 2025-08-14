@@ -1,5 +1,7 @@
 # Stock-Forecaster
 
+**Disclaimer:** This project and its machine learning model are for educational and informational purposes only and do not constitute financial advice. Do not use these forecasts for investment decisions.
+
 Stock-Forecaster is an automated pipeline for extracting, forecasting, and evaluating stock prices using Python, Prophet, FastAPI, MLflow, and Airflow.
 
 ## Features

@@ -6,12 +6,19 @@ from datetime import datetime
 import pandas as pd
 from sklearn.metrics import mean_absolute_error
 
-def train_and_save_model(file_path="stocks.csv", ticker="NVDA", model_path="prophet_model.pkl"):
+def train_and_save_model(file_path="stocks.csv", ticker="NVDA", model_path=None):
     # Load and split the data
     train_df, _ = load_and_split_data(file_path, ticker)
     # Train the model
     model = train_model(train_df)
-    # Save the model as a pickle file
+    # Choose best model file name for ticker
+    if model_path is None:
+        if ticker == "NVDA":
+            model_path = "models/prophet_NVDA_run_3.pkl"
+        elif ticker == "MSFT":
+            model_path = "models/prophet_MSFT_run_5.pkl"
+        elif ticker == "PLTR":
+            model_path = "models/prophet_PLTR_run_5.pkl"
     with open(model_path, "wb") as f:
         pickle.dump(model, f)
     print(f"Model saved to {model_path}")
@@ -64,4 +71,5 @@ def evaluate_mae(file_path="stocks.csv", model_path="prophet_model.pkl", days=7)
         return None
 
 if __name__ == "__main__":
-    train_and_save_model()
+    for ticker in ["NVDA", "MSFT", "PLTR"]:
+        train_and_save_model(ticker=ticker)
