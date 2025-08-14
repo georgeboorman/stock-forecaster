@@ -97,7 +97,7 @@ def save_to_csv(data_dict, filename="stocks.csv"):
     """
     combined_df = pd.concat(data_dict.values(), ignore_index=True)
     write_header = not os.path.exists(filename)
-    combined_df.to_csv(filename, mode='a', header=write_header, index=False, line_terminator='\n')
+    combined_df.to_csv(filename, mode='a', header=write_header, index=False)
     print(f"Data appended to {filename}")
 
 if __name__ == "__main__":
