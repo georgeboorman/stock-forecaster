@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 import pickle
 from forecast import load_and_split_data, train_model
 import mlflow
@@ -19,13 +20,21 @@ def train_and_save_model(file_path="stocks.csv", ticker="NVDA", model_path=None)
             model_path = "models/prophet_MSFT_prod.pkl"
         elif ticker == "PLTR":
             model_path = "models/prophet_PLTR_prod.pkl"
-    with open(model_path, "wb") as f:
-        pickle.dump(model, f)
-    print(f"Model saved to {model_path}")
+    # Evaluate MAE for last 7 days
+    mae = evaluate_mae(file_path=file_path, ticker=ticker, days=7)
+    # Check previous prod model MAE
+    prev_mae = None
+    if os.path.exists(model_path):
+        prev_mae = evaluate_mae(file_path=file_path, ticker=ticker, days=7)
+    # If new model is better (lower MAE) or no previous model, save as prod
+    if prev_mae is None or (mae is not None and mae < prev_mae):
+        with open(model_path, "wb") as f:
+            pickle.dump(model, f)
+        print(f"New model saved to {model_path} (MAE: {mae:.4f})")
+    else:
+        print(f"New model not saved to {model_path} (MAE: {mae:.4f} >= previous MAE: {prev_mae:.4f})")
     # Log retrain time
     retrain_time = datetime.now().isoformat()
-    # Evaluate MAE for last 7 days and log with MLflow
-    mae = evaluate_mae(file_path=file_path, ticker=ticker, days=7)
     with open("retrain_log.txt", "a") as logf:
         logf.write(f"Retrained at {retrain_time}, MAE: {mae if mae is not None else 'N/A'}\n")
     mlflow.set_experiment("stock_forecaster")
@@ -34,7 +43,8 @@ def train_and_save_model(file_path="stocks.csv", ticker="NVDA", model_path=None)
         mlflow.log_param("retrain_time", retrain_time)
         if mae is not None:
             mlflow.log_metric("mae_last_7_days", mae)
-        mlflow.log_artifact(model_path)
+        if prev_mae is not None:
+            mlflow.log_metric("prev_mae_last_7_days", prev_mae)
         mlflow.log_artifact(file_path)
         mlflow.log_artifact("retrain_log.txt")
 

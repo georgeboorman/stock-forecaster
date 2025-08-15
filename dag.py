@@ -4,13 +4,14 @@ from datetime import datetime, timedelta
 import subprocess
 import os
 import sys
+from retraining import evaluate_mae
+
+today = datetime.today().strftime("%Y-%m-%d")
 
 BASE_DIR = os.environ.get("BASE_DIR")
 sys.path.append(BASE_DIR)
 EXTRACT_SCRIPT = os.path.join(BASE_DIR, 'extract.py')
 DATA_PATH = os.path.join(BASE_DIR, 'stocks.csv')
-
-from retraining import evaluate_mae
 
 default_args = {
     'owner': 'airflow',
@@ -39,7 +40,17 @@ def evaluate_model():
             model_path = os.path.join(BASE_DIR, "models/prophet_MSFT_prod.pkl")
         elif ticker == "PLTR":
             model_path = os.path.join(BASE_DIR, "models/prophet_PLTR_prod.pkl")
-        retraining.evaluate_mae(file_path=DATA_PATH, model_path=model_path, days=7)
+        retraining.evaluate_mae(file_path=DATA_PATH, ticker=ticker, days=7)
+
+def git_commit_and_push():
+    import subprocess
+    # Add updated files
+    subprocess.run(['git', 'add', 'stocks.csv'], check=True)
+    subprocess.run(['git', 'add', 'models/'], check=True)
+    # Commit changes
+    subprocess.run(['git', 'commit', '-m', f'Update data and models from Airflow DAG ({today})'], check=False)
+    # Push to remote
+    subprocess.run(['git', 'push', 'origin', 'main'], check=False)
 
 dag = DAG(
     'stock_forecaster_retrain_eval',
@@ -67,4 +78,10 @@ evaluate_task = PythonOperator(
     dag=dag,
 )
 
-extract_task >> retrain_task >> evaluate_task
+git_task = PythonOperator(
+    task_id='git_commit_and_push',
+    python_callable=git_commit_and_push,
+    dag=dag,
+)
+
+extract_task >> retrain_task >> evaluate_task >> git_task
