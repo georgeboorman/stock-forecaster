@@ -14,18 +14,18 @@ def train_and_save_model(file_path="stocks.csv", ticker="NVDA", model_path=None)
     # Choose best model file name for ticker
     if model_path is None:
         if ticker == "NVDA":
-            model_path = "models/prophet_NVDA_run_3.pkl"
+            model_path = "models/prophet_NVDA_prod.pkl"
         elif ticker == "MSFT":
-            model_path = "models/prophet_MSFT_run_5.pkl"
+            model_path = "models/prophet_MSFT_prod.pkl"
         elif ticker == "PLTR":
-            model_path = "models/prophet_PLTR_run_5.pkl"
+            model_path = "models/prophet_PLTR_prod.pkl"
     with open(model_path, "wb") as f:
         pickle.dump(model, f)
     print(f"Model saved to {model_path}")
     # Log retrain time
     retrain_time = datetime.now().isoformat()
     # Evaluate MAE for last 7 days and log with MLflow
-    mae = evaluate_mae(file_path=file_path, model_path=model_path, days=7)
+    mae = evaluate_mae(file_path=file_path, ticker=ticker, days=7)
     with open("retrain_log.txt", "a") as logf:
         logf.write(f"Retrained at {retrain_time}, MAE: {mae if mae is not None else 'N/A'}\n")
     mlflow.set_experiment("stock_forecaster")
@@ -39,13 +39,21 @@ def train_and_save_model(file_path="stocks.csv", ticker="NVDA", model_path=None)
         mlflow.log_artifact("retrain_log.txt")
 
 
-def evaluate_mae(file_path="stocks.csv", model_path="prophet_model.pkl", days=7):
+def evaluate_mae(file_path="stocks.csv", ticker="NVDA", days=7):
+    if ticker == "NVDA":
+        model_path = "models/prophet_NVDA_prod.pkl"
+    elif ticker == "MSFT":
+        model_path = "models/prophet_MSFT_prod.pkl"
+    elif ticker == "PLTR":
+        model_path = "models/prophet_PLTR_prod.pkl"
+    else:
+        raise ValueError(f"Unknown ticker: {ticker}")
     df = pd.read_csv(file_path)
     with open(model_path, 'rb') as f:
         model = pickle.load(f)
     df['ds'] = pd.to_datetime(df['date'])
     df = df.sort_values('ds')
-    test_df = df.tail(days)
+    test_df = df[df['ticker'] == ticker].tail(days)
     # Forecast for the actual test dates
     future = pd.DataFrame({'ds': test_df['ds']})
     forecast = model.predict(future)
@@ -64,10 +72,10 @@ def evaluate_mae(file_path="stocks.csv", model_path="prophet_model.pkl", days=7)
             y_pred.append(pred)
     if y_true:
         mae = mean_absolute_error(y_true, y_pred)
-        print(f"MAE for last {days} days: {mae:.4f}")
+        print(f"MAE for {ticker} in last {days} days: {mae:.4f}")
         return mae
     else:
-        print("No overlapping dates for evaluation.")
+        print("No overlapping dates for evaluation for {ticker}.")
         return None
 
 if __name__ == "__main__":

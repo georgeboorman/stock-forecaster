@@ -23,6 +23,9 @@ def run_experiment(file_path="stocks.csv", ticker="NVDA", param_grid=None, model
     df = df.sort_values("ds")
     train_df = df.copy()
     mlflow.set_experiment("prophet_hyperparam_experiments")
+    best_mae = None
+    best_model = None
+    best_params = None
     for i, params in enumerate(param_grid):
         run_name = f"{ticker}_run_{i}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         with mlflow.start_run(run_name=run_name):
@@ -44,13 +47,23 @@ def run_experiment(file_path="stocks.csv", ticker="NVDA", param_grid=None, model
             forecast = model.predict(future)
             forecast = forecast.set_index("ds")
             y_true = test_df["y"].values
-            y_pred = forecast.loc[test_df["ds"]]["yhat"].values
+            y_pred = forecast.loc[test_df["ds"], "yhat"].values
             if len(y_true) == len(y_pred):
                 mae = ((y_true - y_pred) ** 2).mean() ** 0.5
                 mlflow.log_metric("mae_last_7_days", mae)
+                print(f"Run {i} for {ticker}: params={params}, MAE={mae}")
+                if best_mae is None or mae < best_mae:
+                    best_mae = mae
+                    best_model = model
+                    best_params = params
             else:
-                mlflow.log_metric("mae_last_7_days", None)
-            print(f"Run {i} for {ticker}: params={params}, MAE={mae if len(y_true)==len(y_pred) else 'N/A'}")
+                print(f"Run {i} for {ticker}: params={params}, MAE=N/A (no valid predictions)")
+    # Save best model as prophet_{ticker}_prod.pkl
+    if best_model is not None:
+        prod_path = f"{model_dir}/prophet_{ticker}_prod.pkl"
+        with open(prod_path, "wb") as f:
+            pickle.dump(best_model, f)
+        print(f"Best model for {ticker} saved to {prod_path} with MAE={best_mae} and params={best_params}")
 
 if __name__ == "__main__":
     for ticker in ["NVDA", "MSFT", "PLTR"]:

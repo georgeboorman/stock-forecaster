@@ -44,9 +44,9 @@ def predict_stock(
     """
     # Select best model file for ticker
     model_files = {
-        "NVDA": "models/prophet_NVDA_run_3.pkl",
-        "MSFT": "models/prophet_MSFT_run_5.pkl",
-        "PLTR": "models/prophet_PLTR_run_5.pkl"
+        "NVDA": "models/prophet_NVDA_prod.pkl",
+        "MSFT": "models/prophet_MSFT_prod.pkl",
+        "PLTR": "models/prophet_PLTR_prod.pkl"
     }
     model_path = model_files.get(ticker)
     if not model_path or not os.path.exists(model_path):

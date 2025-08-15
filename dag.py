@@ -34,11 +34,11 @@ def evaluate_model():
     import retraining
     for ticker in ["NVDA", "MSFT", "PLTR"]:
         if ticker == "NVDA":
-            model_path = os.path.join(BASE_DIR, "models/prophet_NVDA_run_3.pkl")
+            model_path = os.path.join(BASE_DIR, "models/prophet_NVDA_prod.pkl")
         elif ticker == "MSFT":
-            model_path = os.path.join(BASE_DIR, "models/prophet_MSFT_run_5.pkl")
+            model_path = os.path.join(BASE_DIR, "models/prophet_MSFT_prod.pkl")
         elif ticker == "PLTR":
-            model_path = os.path.join(BASE_DIR, "models/prophet_PLTR_run_5.pkl")
+            model_path = os.path.join(BASE_DIR, "models/prophet_PLTR_prod.pkl")
         retraining.evaluate_mae(file_path=DATA_PATH, model_path=model_path, days=7)
 
 dag = DAG(
