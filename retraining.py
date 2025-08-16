@@ -36,7 +36,7 @@ def train_and_save_model(file_path="stocks.csv", ticker="NVDA", model_path=None)
     # Log retrain time
     retrain_time = datetime.now().isoformat()
     with open("retrain_log.txt", "a") as logf:
-        logf.write(f"Retrained at {retrain_time}, MAE: {mae if mae is not None else 'N/A'}\n")
+        logf.write(f"Retrained at {retrain_time}, MAE for {ticker}: {mae if mae is not None else 'N/A'}\n")
     mlflow.set_experiment("stock_forecaster")
     with mlflow.start_run(run_name=f"retrain_{retrain_time}"):
         mlflow.log_param("ticker", ticker)
