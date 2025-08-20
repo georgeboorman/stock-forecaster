@@ -1,7 +1,6 @@
 from datetime import datetime
 import pickle
 from fastapi import FastAPI, Query
-from pydantic import BaseModel
 from fastapi.responses import HTMLResponse
 
 import os
@@ -74,6 +73,3 @@ def predict_stock(
         "predicted_value": predicted_value
     }
 
-@app.get("/")
-def read_root():
-    return {"message": "Stock forecasting model API."}

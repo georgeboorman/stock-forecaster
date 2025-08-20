@@ -22,7 +22,7 @@ default_args = {
 }
 
 def run_extract():
-    subprocess.run(['python3', EXTRACT_SCRIPT], check=True)
+    subprocess.run(['python3', EXTRACT_SCRIPT], check=True, cwd=BASE_DIR)
 
 def retrain_model():
     # Retrain models for all tickers
@@ -34,23 +34,24 @@ def evaluate_model():
     # Evaluate models for all tickers
     import retraining
     for ticker in ["NVDA", "MSFT", "PLTR"]:
-        if ticker == "NVDA":
-            model_path = os.path.join(BASE_DIR, "models/prophet_NVDA_prod.pkl")
-        elif ticker == "MSFT":
-            model_path = os.path.join(BASE_DIR, "models/prophet_MSFT_prod.pkl")
-        elif ticker == "PLTR":
-            model_path = os.path.join(BASE_DIR, "models/prophet_PLTR_prod.pkl")
+        # No longer required due to changes in retraining.py
+        # if ticker == "NVDA":
+        #     model_path = os.path.join(BASE_DIR, "models/prophet_NVDA_prod.pkl")
+        # elif ticker == "MSFT":
+        #     model_path = os.path.join(BASE_DIR, "models/prophet_MSFT_prod.pkl")
+        # elif ticker == "PLTR":
+        #     model_path = os.path.join(BASE_DIR, "models/prophet_PLTR_prod.pkl")
         retraining.evaluate_mae(file_path=DATA_PATH, ticker=ticker, days=7)
 
 def git_commit_and_push():
     import subprocess
     # Add updated files
-    subprocess.run(['git', 'add', 'stocks.csv'], check=True)
-    subprocess.run(['git', 'add', 'models/'], check=True)
+    subprocess.run(['git', 'add', 'stocks.csv'], check=True, cwd=BASE_DIR)
+    subprocess.run(['git', 'add', 'models/'], check=True, cwd=BASE_DIR)
     # Commit changes
-    subprocess.run(['git', 'commit', '-m', f'Update data and models from Airflow DAG ({today})'], check=False)
+    subprocess.run(['git', 'commit', '-m', f'Update data and models from Airflow DAG ({today})'], check=False, cwd=BASE_DIR)
     # Push to remote
-    subprocess.run(['git', 'push', 'origin', 'main'], check=False)
+    subprocess.run(['git', 'push', 'origin', 'main'], check=False, cwd=BASE_DIR)
 
 dag = DAG(
     'stock_forecaster_retrain_eval',
